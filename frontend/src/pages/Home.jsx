@@ -5,8 +5,14 @@ const socket = io("http://localhost:8000");
 const Home = () => {
   const [myId, setMyId] = useState("");
   const [message, setMessage] = useState("");
-  const sendMessage=()=>{
-   socket.emit("send_message",message)
+
+  const loginWithGoogle = () => {
+    window.location.href =
+      "http://localhost:8000/auth/google";
+  };
+
+  const sendMessage = () => {
+    socket.emit("send_message", message)
   }
 
   useEffect(() => {
@@ -14,12 +20,24 @@ const Home = () => {
       setMyId(socket.id);
     });
 
-     socket.on("receiver_message", (data) => {
+    socket.on("receiver_message", (data) => {
       console.log(data)
     });
   }, []);
+
+  const token = localStorage.getItem("token");
+
   return (
     <>
+      {!token ? (
+        <button onClick={loginWithGoogle}>
+          Login with Google
+        </button>
+      ) : (
+        <h3>Logged In</h3>
+      )}
+
+      <hr />
       <div>Home : {myId}</div>
       <input
         type="text"
