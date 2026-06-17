@@ -1,36 +1,34 @@
-const express =require("express")
-const http =require("http")
-const cors =require("cors")
-const {Server} =require("socket.io")
+require("dotenv").config()
+const http = require("http")
+const { Server } = require("socket.io")
+const connectDB = require("./config/db")
+const app = require("./app")
 
-const app=express()
-app.use(cors())
+const httpServer = http.createServer(app)
 
-// app.use("/app",application)
-
-
-const httpServer=http.createServer(app)
-
-const io=new Server(httpServer,{
-    cors:{
-        origin:"http://localhost:5173",
-        methods:["GET","POST"]
-    }
+const io = new Server(httpServer, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+  },
 })
-io.on("connection",(socket)=>{
-    socket.on("send_message",(data)=>{
-        console.log(data)
-        socket.emit("receiver_message",data)
+
+io.on("connection", (socket) => {
+  socket.on("send_message", (data) => {
+    console.log(data)
+    socket.emit("receiver_message", data)
+  })
+})
+
+const PORT = process.env.PORT || 8000
+
+connectDB()
+  .then(() => {
+    httpServer.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`)
     })
-    
-})
-
-
-const PORT=8000
-httpServer.listen(PORT,()=>{
-    console.log("sever is. running ")
-})
-
-
-
-
+  })
+  .catch((err) => {
+    console.error("Failed to connect to MongoDB:", err.message)
+    process.exit(1)
+  })
