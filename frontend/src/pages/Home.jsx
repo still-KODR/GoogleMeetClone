@@ -1,34 +1,29 @@
 import { useState } from "react";
 import { useEffect } from "react";
+import {useNavigate} from 'react-router'
 import { io } from "socket.io-client";
 const socket = io("http://localhost:8000");
 const Home = () => {
   const [myId, setMyId] = useState("");
-  const [message, setMessage] = useState("");
-  const sendMessage=()=>{
-   socket.emit("send_message",message)
+  const navigate=useNavigate()
+  const createRoom =()=>{
+    socket.emit("create_room")
   }
-
+ 
   useEffect(() => {
     socket.on("connect", () => {
       setMyId(socket.id);
     });
+    socket.on("room_created",(roomId)=>{
+        navigate(`/room/${roomId}`)
+    })
 
-     socket.on("receiver_message", (data) => {
-      console.log(data)
-    });
   }, []);
   return (
     <>
       <div>Home : {myId}</div>
-      <input
-        type="text"
-        placeholder="enter the message"
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-      />
-
-      <button onClick={sendMessage}>send</button>
+      <button onClick={createRoom}>Create Room</button>
+     
     </>
   );
 };

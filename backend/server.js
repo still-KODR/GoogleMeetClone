@@ -1,7 +1,12 @@
+const  dotenv=require("dotenv")
+dotenv.config()
 const express =require("express")
 const http =require("http")
 const cors =require("cors")
-const {Server} =require("socket.io")
+const { v4: uuidv4 } = require('uuid');
+const {Server} =require("socket.io");
+const { hostname } = require("os");
+const redis = require("./config/redis.js")
 
 const app=express()
 app.use(cors())
@@ -17,12 +22,36 @@ const io=new Server(httpServer,{
         methods:["GET","POST"]
     }
 })
+//coonection pool
 io.on("connection",(socket)=>{
+
+    //message
     socket.on("send_message",(data)=>{
         console.log(data)
-        socket.emit("receiver_message",data)
+        io.emit("receiver_message",data)
     })
+
+
+    //room creation
+    socket.on("create_room",async()=>{
+       const roomId= uuidv4();
+        socket.join(roomId)
+
+        const meeting={
+            host:socket.id,
+            participants:[socket.id],
+            isMeetingLive:false
+        }
+        await redis.set(roomId,JSON.stringify(meeting))
+
+        const data=await redis.get(roomId)
     
+        socket.emit("room_created",roomId)
+        io.to(roomId).emit("participants",JSON.parse(data.participants))
+
+
+
+    })
 })
 
 
