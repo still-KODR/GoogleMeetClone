@@ -1,7 +1,8 @@
 import { createBrowserRouter } from "react-router";
-import Home from "../pages/Home.jsx";
+import Home from "../pages/Home";
+import Room from "../pages/Room";
 
 export const router = createBrowserRouter([
   { path: "/", element: <Home /> },
-  { path: "/room/:roomID" },
+  { path: "/room/:roomId", element: <Room /> },
 ]);
