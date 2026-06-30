@@ -41,10 +41,10 @@ io.on("connection", (socket) => {
     };
     await redis.set(roomId, JSON.stringify(meeting));
 
-    const data = await redis.get(roomId);
+   
 
     socket.emit("room_created", roomId);
-    io.to(roomId).emit("participants", JSON.parse(data.participants));
+    io.to(roomId).emit("participants", meeting.participants);
   });
 });
 
