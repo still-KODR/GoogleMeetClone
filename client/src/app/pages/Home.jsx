@@ -1,9 +1,23 @@
-import React from 'react'
+import React from "react";
+import { Navigate } from "react-router";
+import useAuth from "../../hooks/useAuth";
 
 const Home = () => {
-  return (
-    <div>Home</div>
-  )
-}
+  const { user, loading } = useAuth();
+  if (loading) {
+    return <h1>Loading...</h1>;
+  }
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
 
-export default Home
+  return (
+    <>
+      <h1>Welcome {user.name}</h1>
+
+      <button>Create Room</button>
+    </>
+  );
+};
+
+export default Home;

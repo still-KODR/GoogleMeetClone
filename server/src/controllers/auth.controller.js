@@ -1,32 +1,32 @@
-import { env } from "../config/env.js";
-import googleClient from "../config/google.js";
+import { verifyGoogleToken } from "../services/auth.service.js";
 
-export const googleLoginController = async (req, res) => {
+export const googleLoginController = async (req, res, next) => {
   try {
     const { credential } = req.body;
     if (!credential) {
       return res.status(400).json({ message: "Google token is required" });
     }
-    const ticket = await googleClient.verifyIdToken({
-      idToken: credential,
-      audience: env.GOOGLE_CLIENT_ID,
-    });
-    const payload = ticket.getPayload();
-    console.log(payload)
-  
-    return res.json({
-      success: true,
-      user: {
-        name: payload.name,
-        email: payload.email,
-        picture: payload.picture,
-      },
-    });
-  } catch (error) {
-    return res.status(401).json({
-      success: false,
 
-    message:"Authentication Failed"
+    const { user, token } = await verifyGoogleToken(credential);
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax", 
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
+    return res.status(200).json({
+      success: true,
+      user,
+    });
+    // throw new Error("Testing Error Middleware");
+  } catch (error) {
+    next(error);
   }
+};
+
+export const meController = (req, res) => {
+  res.json({
+    success: true,
+    user: req.user,
+  });
 };
