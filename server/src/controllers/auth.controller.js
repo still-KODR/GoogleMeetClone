@@ -11,7 +11,7 @@ export const googleLoginController = async (req, res, next) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: false,
-      sameSite: "lax", 
+      sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     return res.status(200).json({
@@ -24,6 +24,18 @@ export const googleLoginController = async (req, res, next) => {
   }
 };
 
+export const logoutController = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Logged out successfully",
+  });
+};
 export const meController = (req, res) => {
   res.json({
     success: true,

@@ -2,12 +2,12 @@ import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
 import { createContext } from "react";
-import api from "../app/services/api";
+import api from "../services/api";
 
 export const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-     console.log("AuthProvider Mounted");
+  console.log("AuthProvider Mounted");
   const [user, setUser] = useState(null);
 
   const [loading, setLoading] = useState(true);
