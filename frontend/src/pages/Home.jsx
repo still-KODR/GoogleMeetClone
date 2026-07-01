@@ -21,7 +21,7 @@ const Home = () => {
       socket.off("connect");
       socket.off("room_created");
     };
-  }, []);
+  }, [myId,navigate]);
   return (
     <>
       <div>Home : {myId}</div>
